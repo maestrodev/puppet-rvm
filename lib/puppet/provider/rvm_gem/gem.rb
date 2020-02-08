@@ -27,6 +27,9 @@ Puppet::Type.type(:rvm_gem).provide(:gem) do
       command << "--local"
     else
       command << "--remote"
+      if resource[:source] && source_uri(resource[:source]).scheme =~ /^http/
+        command << '--source' << resource[:source].to_s
+      end
     end
 
     if name = hash[:justme]
@@ -76,7 +79,6 @@ Puppet::Type.type(:rvm_gem).provide(:gem) do
     end
   end
 
-
   def install(useversion = true)
     command = gembinary + ['install']
     command << "-v" << resource[:ensure] if (! resource[:ensure].is_a? Symbol) and useversion
@@ -89,12 +91,7 @@ Puppet::Type.type(:rvm_gem).provide(:gem) do
     end
 
     if source = resource[:source]
-      begin
-        uri = URI.parse(source)
-      rescue => detail
-        fail "Invalid source '#{uri}': #{detail}"
-      end
-
+      uri = source_uri(source)
       case uri.scheme
       when nil
         # no URI scheme => interpret the source as a local file
@@ -121,6 +118,15 @@ Puppet::Type.type(:rvm_gem).provide(:gem) do
     output = execute(command)
     # Apparently some stupid gem versions don't exit non-0 on failure
     self.fail "Could not install: #{output.chomp}" if output.include?("ERROR")
+  end
+
+  def source_uri(source)
+    begin
+      uri = URI.parse(source)
+    rescue => detail
+      fail "Invalid source '#{uri}': #{detail}"
+    end
+    uri
   end
 
   def latest

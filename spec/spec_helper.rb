@@ -18,7 +18,8 @@ RSpec.configure do |c|
     :kernel => 'Linux',
     :osfamily => 'RedHat',
     :architecture => 'x86_64',
-    :clientcert => 'puppet.acme.com'
+    :clientcert => 'puppet.acme.com',
+    :gnupg_installed => false
   }.merge({})
 
   c.before do
@@ -30,4 +31,3 @@ end
 shared_examples :compile, :compile => true do
   it { should compile.with_all_deps }
 end
-
