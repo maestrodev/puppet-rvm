@@ -1,12 +1,39 @@
+#
+# MANAGED BY PUPPET
+#
+
 <% if @umask and !@umask.empty? -%>
 umask <%= @umask %>
 <% end -%>
+
+# rvm Path
+# This is where rvm installs and manages everything in by default.
+export rvm_path="/usr/local/rvm"
+
 <% if @max_time_flag and !@max_time_flag.to_s.empty? -%>
 export rvm_max_time_flag=<%= @max_time_flag %>
 <% end -%>
-<% if @autoupdate_flag and !@autoupdate_flag.to_s.empty?-%>
-rvm_autoupdate_flag=<%= @autoupdate_flag %>
-<% end -%>
+rvm_autoupdate_flag=<%= @autoupdate_flag ? 1 : 0 %>
 <% if @silence_path_mismatch_check_flag and !@silence_path_mismatch_check_flag.to_s.empty? -%>
 rvm_silence_path_mismatch_check_flag=<%= @silence_path_mismatch_check_flag %>
 <%end -%>
+
+# https://rvm.io/workflow/rvmrc
+# chapter "Project .rvmrc": It is on by default !!? so much trouble !!
+# Source a .rvmrc file in a directory after changing to it, if it exists.
+# To disable this fature, set in root/home .rvmrc file:
+export rvm_project_rvmrc=<%= @project_rvmrc ? 1 : 0 %>
+
+# Gem Options
+#   These options are passed to the 'gem' command in a RVM environment.
+export rvm_gem_options="<%= @gem_options %>"
+
+# Install On Use Flag
+# Install rubies when used if are not installed.
+export rvm_install_on_use_flag=<%= @install_on_use_flag ? 1 : 0 %>
+
+# Gemset Create on use Flag
+# This will create a gemset when the gemset is used if it does not exist
+export rvm_gemset_create_on_use_flag=<%= @gemset_create_on_use_flag ? 1 : 0 %>
+
+export rvm_ignore_gemsets_flag=<%= @ignore_gemsets_flag ? 1 : 0 %>

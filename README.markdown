@@ -89,7 +89,7 @@ Or, to configure `/etc/rvmrc` you can use use `Class['rvm::rvmrc]`
 
     class{ 'rvm::rvmrc':
       max_time_flag => 20,
-      before  => Class['rvm'],
+      project_rvmrc => false,
     }
 
 ### Installing JRuby from sources
