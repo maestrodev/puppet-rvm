@@ -14,17 +14,6 @@ class rvm::system(
     default   => $version,
   }
 
-  # curl needs to be installed
-  if ! defined(Package['curl']) {
-    case $::kernel {
-      'Linux': {
-        ensure_packages(['curl'])
-        Package['curl'] -> Exec['system-rvm']
-      }
-      default: { }
-    }
-  }
-
   $http_proxy_environment = $proxy_url ? {
     undef   => [],
     default => ["http_proxy=${proxy_url}", "https_proxy=${proxy_url}"]
@@ -67,11 +56,13 @@ class rvm::system(
 
   }
   else {
+    ensure_packages(['curl'])
     exec { 'system-rvm':
       path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
       command     => "curl -fsSL https://get.rvm.io | bash -s -- --version ${actual_version}",
       creates     => '/usr/local/rvm/bin/rvm',
       environment => $environment,
+      require     => [Package['curl']],
     }
   }
 
