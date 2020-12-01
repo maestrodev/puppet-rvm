@@ -19,7 +19,7 @@ class rvm::system (
     case $facts['kernel'] {
       'Linux': {
         ensure_packages(['curl'])
-        Package['curl'] -> Exec['system-rvm']
+        Package['curl'] -> Class['rvm::verified_install']
       }
       default: {}
     }
@@ -41,7 +41,7 @@ class rvm::system (
     class { 'rvm::gnupg_key':
       key_server => $key_server,
       key_id     => $gnupg_key_id,
-      before     => Exec['system-rvm'],
+      before     => Class['rvm::verified_install'],
     }
   }
 
@@ -65,11 +65,9 @@ class rvm::system (
     }
   }
   else {
-    exec { 'system-rvm':
-      path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
-      command     => "curl -fsSL https://get.rvm.io | bash -s -- --version ${actual_version}",
-      creates     => '/usr/local/rvm/bin/rvm',
-      environment => $environment,
+    class { 'rvm::verified_install':
+      environment    => $environment,
+      actual_version => $actual_version,
     }
   }
 
@@ -87,7 +85,7 @@ class rvm::system (
       -> exec { 'system-rvm-get':
         path        => '/usr/local/rvm/bin:/usr/bin:/usr/sbin:/bin',
         command     => "rvm get ${version}",
-        before      => Exec['system-rvm'], # so it doesn't run after being installed the first time
+        before      => Class['rvm::verified_install'], # so it doesn't run after being installed the first time
         environment => $environment,
       }
     }
